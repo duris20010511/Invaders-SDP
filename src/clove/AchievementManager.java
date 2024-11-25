@@ -5,6 +5,7 @@ import screen.Screen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 // TODO : Replace Object to Achievement Class
@@ -104,5 +105,9 @@ public class AchievementManager {
             return setAchievementValue(achievement, true);
         }
         return false;
+    }
+
+    public List<Achievement> getAllAchievements() {
+        return achievementConditions.getAllAchievements();
     }
 }

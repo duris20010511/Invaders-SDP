@@ -276,4 +276,8 @@ public class AchievementConditions {
     public int getTotalAchievements() {
         return unlockedAchievements.size();
     }
+
+    public List<Achievement> getAllAchievements() {
+        return new ArrayList<>(allAchievements);
+    }
 }

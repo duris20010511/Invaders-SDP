@@ -366,6 +366,13 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing recent record screen.");
 				break;
+			case 6:
+				// Achievement page
+				currentScreen = new AchievementsScreen(width, height, FPS, achievementManager);
+				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT + "achievements screen at " + FPS + " fps.");
+				returnCode = frame.setScreen(currentScreen);
+				LOGGER.info("Closing achievements screen.");
+
 			default:
 				break;
 			}
