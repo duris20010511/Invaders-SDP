@@ -89,7 +89,7 @@ public final class FileManager {
 						else
 							sprite.getValue()[i][j] = false;
 					}
-				logger.fine("Sprite " + sprite.getKey() + " loaded.");
+				logger.info("Sprite " + sprite.getKey() + " loaded.");
 			}
 			if (inputStream != null)
 				inputStream.close();

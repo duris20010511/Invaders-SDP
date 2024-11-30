@@ -1,7 +1,7 @@
 package entity;
 
 import java.awt.Color;
-import java.io.File;
+import java.io.*;
 import java.util.Set;
 
 import Enemy.PiercingBullet;
@@ -53,7 +53,7 @@ public class Ship extends Entity {
 	public Ship(final int positionX, final int positionY, final Color color) {
 		super(positionX, positionY - 50, 13 * 2, 8 * 2, color); // add by team HUD
 
-		this.spriteType = SpriteType.Ship;
+		this.spriteType = loadSpriteTypeFromFile("/skins");
 
 		// Create PlayerGrowth object and set initial stats
 		this.growth = new PlayerGrowth();  // PlayerGrowth 객체를 먼저 초기화
@@ -68,6 +68,27 @@ public class Ship extends Entity {
 
 		this.numberOfBullet = new NumberOfBullet();
 	}
+	/** Used to load Skins based on the skins res value. **/
+	private SpriteType loadSpriteTypeFromFile(String path) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(path)))) {
+			if (br == null) {
+				System.err.println("Sprite type file not found.");
+				return SpriteType.Ship; // Return default value in case of file not found
+			}
+			String type = br.readLine();
+			try {
+				return SpriteType.valueOf(type);
+			} catch (IllegalArgumentException e) {
+				System.err.println("Invalid sprite type. Defaulting the Ship.");
+				return SpriteType.Ship; // Return default value
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return SpriteType.Ship; // Default value in case of IOException
+	}
+
 
 	/**
 	 * Moves the ship speed uni ts right, or until the right screen border is
