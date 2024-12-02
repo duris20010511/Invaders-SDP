@@ -20,7 +20,7 @@ public class AchievementConditions {
     private DrawManager drawManager;
 
     private GameState gameState;
-    private static Logger logger;
+    private static final Logger LOGGER = Logger.getLogger(AchievementConditions.class.getName());
 
     private int highestLevel;
     private int totalBulletsShot;
@@ -42,6 +42,10 @@ public class AchievementConditions {
     private List<String> unlockedAchievements = new ArrayList<>();
 
     private static final int FAST_KILL_TIME = 5;
+    private static final long TIME_LIMIT = 3000;
+    private ScheduledExecutorService scheduler;
+    private long lastKillTime = 0;
+    private int enemiesKilledIn3Seconds = 0;
 
     public AchievementConditions() {
         initializeAchievements();
@@ -50,7 +54,7 @@ public class AchievementConditions {
             this.stats = new Statistics();
             setStatistics();
         } catch (IOException e){
-            logger.warning("Couldn't load Statistics!");
+            LOGGER.warning("Couldn't load Statistics!");
         }
 
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -59,26 +63,6 @@ public class AchievementConditions {
 
     private void setStatistics() throws IOException {
         this.stats = stats.loadUserData(stats);
-    }
-
-    private int enemiesKilledIn3Seconds = 0;
-
-    public void startFastKillCheck() {
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                if (enemiesKilledIn3Seconds > 0) {
-                    fastKill(enemiesKilledIn3Seconds);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }, 0, 1, TimeUnit.SECONDS);
-    }
-
-    public void stopFastKillCheck() {
-        if (scheduler != null && !scheduler.isShutdown()) {
-            scheduler.shutdown();
-        }
     }
 
     public AchievementConditions(DrawManager drawManager) {
@@ -127,25 +111,17 @@ public class AchievementConditions {
 
     // Have to check if the code right below works
     public void checkAllAchievements() {
-        boolean allCompleted = true;
-
-        System.out.println("Checking all achievements...");
-        for (Achievement achievement: allAchievements) {
-            if (!achievement.isCompleted()) {
-                allCompleted = false;
-                break;
-            }
-        }
+        boolean allCompleted = allAchievements.stream().allMatch(Achievement::isCompleted);
         if (allCompleted) {
-            completeAchievement(allAchievements.get(allAchievements.size() - 1));
+            completeAchievement(allAchievements.getLast());
         }
     }
 
-    public void onStage() throws  IOException {
+    public void onStage() throws IOException {
         int highestStage = stats.getHighestLevel();
-        System.out.println("Checking stage achievements. Highest stage: " + highestStage);
+        LOGGER.info("Checking stage achievements. Highest stage: " + highestStage);
         for (Achievement achievement : stageAchievements) {
-            if (highestStage >= achievement.getRequiredStages() && !achievement.isCompleted()) {
+            if (highestStage >= achievement.getRequiredValue() && !achievement.isCompleted()) {
                 completeAchievement(achievement);
             }
         }
@@ -156,20 +132,13 @@ public class AchievementConditions {
         lastKillTime = System.currentTimeMillis();
 
         int currentKills = stats.getTotalShipsDestroyed();
-        System.out.println("Checking kill achievements. Current kills: " + currentKills);
-        System.out.println("Kill Achievements size: " + killAchievements.size());
+        LOGGER.info("Checking kill achievements. Current kills: " + currentKills);
         for (Achievement achievement : killAchievements) {
-            System.out.println("Checking " + achievement.getAchievementName());
-            if (currentKills >= achievement.getRequiredKills() && !achievement.isCompleted()) {
+            if (currentKills >= achievement.getRequiredValue() && !achievement.isCompleted()) {
                 completeAchievement(achievement);
             }
         }
     }
-
-    private ScheduledExecutorService scheduler;
-
-    private static final long TIME_LIMIT = 3000;
-    private long lastKillTime = 0;
 
     private void resetKillCountIfNeeded() {
         long currentTime = System.currentTimeMillis();
@@ -177,35 +146,55 @@ public class AchievementConditions {
             enemiesKilledIn3Seconds = 0;
         }
     }
-    // TODO Not functioning well
+
+    //
     public void fastKill(int killCount) throws IOException {
         long currentTime = System.currentTimeMillis();
 
-        if (currentTime - lastKillTime <= TIME_LIMIT) {
-            resetKillCountIfNeeded();
-        } else {
-            enemiesKilledIn3Seconds = 0;
-        }
-        lastKillTime = currentTime;
-
-        if (enemiesKilledIn3Seconds > 0) {
-            //System.out.println("Kills in last 3 seconds: " + enemiesKilledIn3Seconds);
-        }
-        if (enemiesKilledIn3Seconds >= Achievement.getRequiredFastKills()) {
-            System.out.println("Checking fastkill achievements. Current fastkills: " + killCount);
-            for (Achievement achievement : fastKillAchievements) {
-                if (!achievement.isCompleted()) {
+        if (currentTime - lastKillTime <= TIME_LIMIT) { // 걸린 시간이 시간 제한보다 적음
+            LOGGER.info("Checking fast kill achievement. Current fast kills: " + killCount);
+            for (Achievement achievement : fastKillAchievements) { // fastkill 업적 확인
+                if (killCount >= achievement.getRequiredValue() && !achievement.isCompleted()) {
                     completeAchievement(achievement);
                 }
             }
+        } else { // 아니면 킬 수 초기화
+            enemiesKilledIn3Seconds = 0;
+        }
+        lastKillTime = currentTime; // 시간 갱신
+    }
+
+    // 스케줄러 초기화 메서드 추가
+    private void initializeScheduler() {
+        if (scheduler == null || scheduler.isShutdown()) {
+            scheduler = Executors.newSingleThreadScheduledExecutor();
+        }
+    }
+
+    public void startFastKillCheck() {
+        initializeScheduler();  // 스케줄러가 null 상태일 경우 초기화
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                if (enemiesKilledIn3Seconds > 0) {
+                    fastKill(enemiesKilledIn3Seconds);
+                }
+            } catch (IOException e) {
+                LOGGER.severe("Error during fast kill check: " + e.getMessage());
+            }
+        }, 0, 500, TimeUnit.MILLISECONDS);  // 500ms 간격으로 호출
+    }
+
+    public void stopFastKillCheck() {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
         }
     }
 
     public void checkNoDeathAchievements(int lives) {
-        System.out.println("Checking No Death achievements. Current lives: " + lives);
+        LOGGER.info("Checking No Death achievements. Current lives: " + lives);
         if (lives == Core.MAX_LIVES) {
             for (Achievement achievement : noDeathAchievements) {
-                if (highestLevel==7 && !achievement.isCompleted()) {
+                if (highestLevel==Core.NUM_LEVELS && !achievement.isCompleted()) {
                     completeAchievement(achievement);
                 }
             }
@@ -213,9 +202,9 @@ public class AchievementConditions {
     }
 
     public void score(int score) {
-        System.out.println("Checking score achievements. Current score: " + score);
+        LOGGER.info("Checking score achievements. Current score: " + score);
             for (Achievement achievement : scoreAchievements) {
-                if (score >= achievement.getRequiredScore() && !achievement.isCompleted()) {
+                if (score >= achievement.getRequiredValue() && !achievement.isCompleted()) {
                     completeAchievement(achievement);
                 }
             }
@@ -224,11 +213,9 @@ public class AchievementConditions {
     // TODO function getShipsDestructionStreak not added yet
     public void killStreak() throws IOException {
         int shipsDestructionStreak = stats.getShipsDestructionStreak();
-        System.out.println("Checking killstreak achievements. Current killstreaks: " + shipsDestructionStreak);
-        System.out.println("Killstreak Achievements size: " + streakAchievements.size());
+        LOGGER.info("Checking kill streak achievements. Current streak: " + shipsDestructionStreak);
         for (Achievement achievement : streakAchievements) {
-            System.out.println("Checking " + achievement.getAchievementName());
-            if (shipsDestructionStreak>= achievement.getRequiredKillStreaks() && !achievement.isCompleted()) {
+            if (shipsDestructionStreak>= achievement.getRequiredValue() && !achievement.isCompleted()) {
                 completeAchievement(achievement);
             }
         }
@@ -236,9 +223,9 @@ public class AchievementConditions {
 
     public void trials() {
         int playedTrials = stats.getPlayedGameNumber();
+        LOGGER.info("Checking trial achievements. Played trials: " + playedTrials);
         for (Achievement achievement : trialAchievements) {
-            System.out.println("Checking trial achievements. Current trials: " + playedTrials);
-            if (playedTrials >= achievement.getRequiredTrials() && !achievement.isCompleted()) {
+            if (playedTrials >= achievement.getRequiredValue() && !achievement.isCompleted()) {
                 completeAchievement(achievement);
             }
         }
@@ -250,22 +237,19 @@ public class AchievementConditions {
 
     private void completeAchievement(Achievement achievement) {
         if (!unlockedAchievements.contains(achievement.getAchievementName())) {
-            System.out.println("Achievement Unlocked: " + achievement.getAchievementName() + " - " + achievement.getAchievementDescription());
+            LOGGER.info("Achievement Unlocked: " + achievement.getAchievementName() + " - " + achievement.getAchievementDescription());
             unlockedAchievements.add(achievement.getAchievementName());
             achievement.completeAchievement();
-            getUnlockedAchievements();
-            System.out.println("Unlocked achievements list: " + unlockedAchievements);
             DrawAchievementHud.achieve(achievement.getAchievementName());
             if(achievement.getGem() > 0) {
                 try {
                     Core.getCurrencyManager().addGem(achievement.getGem());
                 } catch (IOException e) {
-                    logger.warning("Couldn't load gem!");
+                    LOGGER.warning("Couldn't load gem!");
                 }
             }
-        }
-        else if (unlockedAchievements.contains(achievement.getAchievementName())) {
-            System.out.println(achievement.getAchievementName() + " has already been unlocked.");
+        } else {
+            LOGGER.info(achievement.getAchievementName() + " has already been unlocked.");
         }
     }
 

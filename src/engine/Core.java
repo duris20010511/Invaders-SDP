@@ -26,9 +26,9 @@ import twoplayermode.TwoPlayerMode;
 
 /**
  * Implements core game logic.
- * 
+ *
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
- * 
+ *
  */
 public final class Core {
 
@@ -45,7 +45,7 @@ public final class Core {
 	private static final int EXTRA_LIFE_FRECUENCY = 3;
 	/** Total number of levels. */
 	public static final int NUM_LEVELS = 7; // TEAM CLOVER : Fixed NUM_LEVELS from privated to public for usage in achievement
-	
+
 	/** Difficulty settings for level 1. */
 	private static final GameSettings SETTINGS_LEVEL_1 =
 			new GameSettings(5, 4, 60, 2000, 1);
@@ -67,7 +67,7 @@ public final class Core {
 	/** Difficulty settings for level 7. */
 	private static final GameSettings SETTINGS_LEVEL_7 =
 			new GameSettings(8, 7, 2, 500, 1);
-	
+
 	/** Frame to draw the screen on. */
 	private static Frame frame;
 	/** Screen currently shown. */
@@ -87,7 +87,7 @@ public final class Core {
 
 	/**
 	 * Test implementation.
-	 * 
+	 *
 	 * @param args
 	 *            Program args, ignored.
 	 */
@@ -108,9 +108,8 @@ public final class Core {
 			LOGGER.setLevel(Level.ALL);
 
 			// TEAM CLOVER : Added log to check if function is working
-			System.out.println("Initializing AchievementManager...");
 			achievementManager = new AchievementManager(DrawManager.getInstance());
-			System.out.println("AchievementManager initialized!");
+			LOGGER.info("AchievementManager initialized!");
 
 			// CtrlS: Make instance of Upgrade Manager
 			Core.getUpgradeManager();
@@ -142,7 +141,7 @@ public final class Core {
 		gameSettings.add(SETTINGS_LEVEL_5);
 		gameSettings.add(SETTINGS_LEVEL_6);
 		gameSettings.add(SETTINGS_LEVEL_7);
-		
+
 		GameState gameState;
 		RoundState roundState;
 
@@ -169,6 +168,7 @@ public final class Core {
 				sm.playES("start_button_ES");
 				sm.playBGM("inGame_bgm");
 
+
 				do {
 					// One extra live every few levels.
 					boolean bonusLife = gameState.getLevel()
@@ -183,7 +183,6 @@ public final class Core {
 							+ " game screen at " + FPS + " fps.");
 					frame.setScreen(currentScreen);
 					LOGGER.info("Closing game screen.");
-
 
 					achievementManager.updateAchievements(currentScreen); // TEAM CLOVER : Achievement
 
@@ -227,6 +226,7 @@ public final class Core {
 								+ " receipt screen at " + FPS + " fps.");
 						frame.setScreen(currentScreen);
 						LOGGER.info("Closing receiptScreen.");
+
 					}
 
                     if (achievementManager != null) { // TEAM CLOVER : Added code
@@ -249,6 +249,7 @@ public final class Core {
 				currentScreen = new ScoreScreen(width, height, FPS, gameState);
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
+
 				break;
 			case 3:
 				// High scores.
@@ -393,7 +394,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the logger.
-	 * 
+	 *
 	 * @return Application logger.
 	 */
 	public static Logger getLogger() {
@@ -402,7 +403,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the drawing manager.
-	 * 
+	 *
 	 * @return Application draw manager.
 	 */
 	public static DrawManager getDrawManager() {
@@ -411,7 +412,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the input manager.
-	 * 
+	 *
 	 * @return Application input manager.
 	 */
 	public static InputManager getInputManager() {
@@ -420,7 +421,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the file manager.
-	 * 
+	 *
 	 * @return Application file manager.
 	 */
 	public static FileManager getFileManager() {
@@ -429,7 +430,7 @@ public final class Core {
 
 	/**
 	 * Controls creation of new cooldowns.
-	 * 
+	 *
 	 * @param milliseconds
 	 *            Duration of the cooldown.
 	 * @return A new cooldown.
@@ -440,7 +441,7 @@ public final class Core {
 
 	/**
 	 * Controls creation of new cooldowns with variance.
-	 * 
+	 *
 	 * @param milliseconds
 	 *            Duration of the cooldown.
 	 * @param variance

@@ -910,4 +910,82 @@ public final class FileManager {
 
 		return defaultProperties;
 	}
+
+
+	public void saveAchievement(Map<String, Boolean> achievement) throws IOException {
+		OutputStream outputStream = null;
+		BufferedWriter bufferedWriter = null;
+
+		try {
+			String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			jarPath = URLDecoder.decode(jarPath, "UTF-8");
+
+			String achievementPath = new File(jarPath).getParent();
+			achievementPath += File.separator + "achievement";
+
+			File achievementFile = new File(achievementPath);
+
+			if (!achievementFile.exists()) {
+				achievementFile.createNewFile();
+			}
+
+			outputStream = new FileOutputStream(achievementFile);
+			bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")));
+
+			logger.info("Saving achievements.");
+
+			for (Map.Entry<String, Boolean> entry : achievement.entrySet()) {
+				bufferedWriter.write(entry.getKey() + ':' + entry.getValue());
+				bufferedWriter.newLine();
+			}
+		} finally {
+			if (bufferedWriter != null) {
+				bufferedWriter.close();
+			}
+		}
+	}
+
+	public Map<String, Boolean> loadAchievements() throws IOException {
+		InputStream inputStream = null;
+		BufferedReader bufferedReader = null;
+
+		Map<String, Boolean> achievements = new HashMap<>();
+
+		try {
+			String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			jarPath = URLDecoder.decode(jarPath, "UTF-8");
+
+			String achievementsPath = new File(jarPath).getParent();
+			achievementsPath += File.separator;
+			achievementsPath += "achievements.txt";
+
+			File achievementsFile = new File(achievementsPath);
+
+			if (!achievementsFile.exists()) {
+				logger.info("Achievements file not found, starting fresh.");
+				return achievements;
+			}
+
+			inputStream = new FileInputStream(achievementsFile);
+			bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+
+			logger.info("Loading achievements.");
+
+			String line;
+			while ((line = bufferedReader.readLine()) != null) {
+				String[] parts = line.split(":");
+				if (parts.length == 2) {
+					String name = parts[0];
+					boolean completed = Boolean.parseBoolean(parts[1]);
+					achievements.put(name, completed);
+				}
+			}
+
+		} finally {
+			if (bufferedReader != null)
+				bufferedReader.close();
+		}
+
+		return achievements;
+	}
 }
