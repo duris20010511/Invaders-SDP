@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.logging.Logger;
 import CtrlS.EncryptionSupport;
+import clove.Achievement;
 import engine.DrawManager.SpriteType;
 
 import clove.Statistics; //Team Clove
@@ -595,7 +596,7 @@ public final class FileManager {
 			long totalPlaytime = Integer.parseInt(properties.getProperty("totalPlaytime"));
 
 			stat = new Statistics(highestLevel, totalBulletsShot, totalShipsDestroyed, shipsDestructionStreak,
-					playedGameNumber, clearAchievementNumber, totalPlaytime);
+					playedGameNumber,clearAchievementNumber, totalPlaytime);
 
 		} finally {
 			if(inputStream != null){
@@ -912,7 +913,7 @@ public final class FileManager {
 	}
 
 
-	public void saveAchievements(Map<String, Boolean> achievement) throws IOException {
+	public void saveAchievements(List<Achievement> achievements) throws IOException {
 		OutputStream outputStream = null;
 		BufferedWriter bufferedWriter = null;
 
@@ -934,8 +935,8 @@ public final class FileManager {
 
 			logger.info("Saving achievements.");
 
-			for (Map.Entry<String, Boolean> entry : achievement.entrySet()) {
-				bufferedWriter.write(entry.getKey() + ':' + entry.getValue());
+			for (Achievement achievement : achievements) {
+				bufferedWriter.write(achievement.toString());
 				bufferedWriter.newLine();
 			}
 		} finally {
@@ -945,11 +946,11 @@ public final class FileManager {
 		}
 	}
 
-	public Map<String, Boolean> loadAchievements() throws IOException {
+	public static List<Achievement> loadAchievements() throws IOException {
 		InputStream inputStream = null;
 		BufferedReader bufferedReader = null;
 
-		Map<String, Boolean> achievements = new HashMap<>();
+		List<Achievement> achievements = new ArrayList<>();
 
 		try {
 			String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -973,11 +974,9 @@ public final class FileManager {
 
 			String line;
 			while ((line = bufferedReader.readLine()) != null) {
-				String[] parts = line.split(":");
-				if (parts.length == 2) {
-					String name = parts[0];
-					boolean completed = Boolean.parseBoolean(parts[1]);
-					achievements.put(name, completed);
+				Achievement achievement = AchievementFromString(line);
+				if (achievement != null) {
+					achievements.add(achievement);
 				}
 			}
 
@@ -987,5 +986,33 @@ public final class FileManager {
 		}
 
 		return achievements;
+	}
+
+	private static Achievement AchievementFromString(String line) {
+		try {
+			line = line.replace("Achievement{", "").replace("}", "").trim();
+
+			String[] parts = line.split(",\\s*");
+
+			String achievementName = parts[0].split("=")[1].replace("'", "").trim();
+			String achievementDescription = parts[1].split("=")[1].replace("'", "").trim();
+			boolean isCompleted = Boolean.parseBoolean(parts[2].split("=")[1].trim());
+			Achievement.AchievementType achievementType = Achievement.AchievementType.valueOf(parts[3].split("=")[1].trim());
+
+
+			String requiredValueStr = parts[4].split("=")[1].trim();
+			int requiredValue = (requiredValueStr.isEmpty()) ? 0 : Integer.parseInt(requiredValueStr);
+
+			String gemStr = parts[5].split("=")[1].trim();
+			int gem = (gemStr.isEmpty()) ? 0 : Integer.parseInt(gemStr);
+
+			Achievement achievement = new Achievement(achievementName, achievementDescription, requiredValue, achievementType, gem);
+			achievement.setCompleted(isCompleted);
+			return achievement;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 }

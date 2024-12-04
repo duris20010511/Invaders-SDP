@@ -191,6 +191,7 @@ public class GameScreen extends Screen {
 		this.hitCount = gameState.getHitCount(); //CtrlS
 		this.fire_id = 0; //CtrlS - fire_id means the id of bullet that shoot already. It starts from 0.
 		this.processedFireBullet = new HashSet<>(); //CtrlS - initialized the processedFireBullet
+		this.fastKill = 0;
 
 		/**
 		* Added by the Level Design team
@@ -256,6 +257,10 @@ public class GameScreen extends Screen {
 		// 	// --- OBSTACLES - Initialize obstacles
 		this.obstacles = new HashSet<>();
 		this.obstacleSpawnCooldown = Core.getCooldown(Math.max(2000 - (level * 200), 500)); // Minimum 0.5s
+
+		//Initialize fastkill
+		fastKill = 0;
+
 	}
 
 	/**
@@ -417,9 +422,11 @@ public class GameScreen extends Screen {
 
 		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
 			//this.logger.info("Final Playtime: " + playTime + " seconds");    //clove
+			achievementConditions.stopFastKillCheck();
 			achievementConditions.checkNoDeathAchievements(lives);
-			achievementConditions.score(score);
             try { //Team Clove
+
+
 				statistics.comHighestLevel(level);
 				statistics.addBulletShot(bulletsShot);
 				statistics.addShipsDestroyed(shipsDestroyed);
@@ -430,6 +437,8 @@ public class GameScreen extends Screen {
 				achievementConditions.killStreak();
 				achievementConditions.fastKill(fastKill);
 				achievementConditions.score(score);
+
+
 
             } catch (IOException e) {
                 throw new RuntimeException(e);

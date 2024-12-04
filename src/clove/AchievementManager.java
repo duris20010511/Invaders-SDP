@@ -25,7 +25,6 @@ public class AchievementManager {
     public AchievementManager(DrawManager drawManager) {
         this.achievementConditions = new AchievementConditions(drawManager);
         this.achievementChangedCallbacks = new ArrayList<>();
-        this.achievementMap = new HashMap<>();
     }
 
     public void updateAchievements(Screen screen) {
@@ -71,10 +70,7 @@ public class AchievementManager {
     /*
         Declare
      */
-    public AchievementManager() { // HashMap<Achievement, Boolean>으로 초기화
-        achievementMap = new HashMap<>();
-        achievementChangedCallbacks = new ArrayList<>();
-    }
+
 
     /*
         Functions
@@ -125,7 +121,7 @@ public class AchievementManager {
 
     public boolean completeAchievement(Achievement achievement) { // Added Code
         if (!achievement.isCompleted()) {
-            achievement.completeAchievement();
+            achievement.CompleteAchievement();
             return setAchievementValue(achievement, true);
         }
         return false;

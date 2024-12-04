@@ -4,6 +4,8 @@ import java.util.logging.Logger;
 
 public class Achievement {
 
+
+
     public enum AchievementType {
         KILLS,
         KILLSTREAKS,
@@ -35,9 +37,9 @@ public class Achievement {
         this.gem = gem;
     }
 
-    public void logCompleteAchievement() {
-        if (!isCompleted) {
-            completeAchievement();
+    public void CompleteAchievement() {
+        if (!this.isCompleted) {
+            this.isCompleted = true;
             LOGGER.info("Achievement completed: " + achievementName);
         }
     }
@@ -63,13 +65,10 @@ public class Achievement {
     }
 
 
-    public void completeAchievement() {
-        if (!isCompleted) {
-            isCompleted = true;
-        }
-    }
-
     public int getGem() { return gem; }
+
+    public void setCompleted(boolean isCompleted) { this.isCompleted = isCompleted; }
+
 
     @Override
     public boolean equals(Object o) {
@@ -86,6 +85,13 @@ public class Achievement {
 
     @Override
     public String toString() {
-        return "Achievement{" + "Achieved: " + achievementName + " - " + achievementDescription + "}";
+        return "Achievement{" +
+                "achievementName='" + achievementName + '\'' +
+                ", achievementDescription='" + achievementDescription + '\'' +
+                ", isCompleted=" + isCompleted +
+                ", achievementType=" + achievementType +
+                ", requiredValue=" + requiredValue +
+                ", gem=" + gem +
+                '}';
     }
 }
