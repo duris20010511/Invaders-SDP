@@ -146,6 +146,35 @@ public final class Core {
 		GameState gameState;
 		RoundState roundState;
 
+		enum RETCODE {
+			TITLE(1),
+			GAME(2),
+			HIGHSCORE(3),
+			TWOPLAYER(4),
+			RECORD(5),
+			SHIPMODEL(6);
+
+			private final int code;
+
+			RETCODE(int code) {
+				this.code = code;
+			}
+
+			public int getCode() {
+				return code;
+			}
+
+			public static RETCODE fromCode(int code) {
+				for (RETCODE r : RETCODE.values()) {
+					if (r.code == code) {
+						return r;
+					}
+				}
+				throw new IllegalArgumentException("Invalid Code!");
+			}
+		}
+
+
 		int returnCode = 1;
 		do {
 			// Add playtime parameter - Soomin Lee / TeamHUD
@@ -153,8 +182,9 @@ public final class Core {
 			// Add coinItemsCollected parameter - Ctrl S
 			gameState = new GameState(1, 0
 					, MAX_LIVES, 0,0, 0, 0, 0, 0, 0, 0);
-			switch (returnCode) {
-			case 1:
+			RETCODE retcodeEnum = RETCODE.fromCode(returnCode);
+			switch (retcodeEnum) {
+			case TITLE:
 				// Main menu.
                 currentScreen = new TitleScreen(width, height, FPS);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -162,7 +192,7 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing title screen.");
 				break;
-			case 2:
+			case GAME:
 				// Game & score.
 				LOGGER.info("Starting inGameBGM");
 				// Sound Operator
@@ -250,7 +280,7 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
-			case 3:
+			case HIGHSCORE:
 				// High scores.
 				currentScreen = new HighScoreScreen(width, height, FPS);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -258,7 +288,7 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing high score screen.");
 				break;
-			case 4:
+			case TWOPLAYER:
 				LOGGER.info("Starting inGameBGM");
 				// Sound Operator
 				sm.playES("start_button_ES");
@@ -358,13 +388,21 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
-			case 5: // 7 -> 5 replaced by Starter
+			case RECORD: // 7 -> 5 replaced by Starter
 				// Recent Records.
 				currentScreen = new RecordScreen(width, height, FPS);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
 						+ " recent record screen at " + FPS + " fps.");
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing recent record screen.");
+				break;
+			case SHIPMODEL:
+				// Ship Model.
+				currentScreen = new ShipModelScreen(width, height, FPS);
+				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
+						+ " ship model screen at " + FPS + " fps.");
+				returnCode = frame.setScreen(currentScreen);
+				LOGGER.info("Closing ship model screen.");
 				break;
 			default:
 				break;
