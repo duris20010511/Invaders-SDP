@@ -70,24 +70,26 @@ public class Ship extends Entity {
 	}
 	/** Used to load Skins based on the skins res value. **/
 	private SpriteType loadSpriteTypeFromFile(String path) {
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(path)))) {
-			if (br == null) {
-				System.err.println("Sprite type file not found.");
-				return SpriteType.Ship; // Return default value in case of file not found
-			}
+		InputStream resourceStream = getClass().getResourceAsStream(path);
+		if (resourceStream == null) {
+			System.err.println("Sprite type file not found.");
+			return SpriteType.Ship; // Return default value in case of file not found
+		}
+
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))) {
 			String type = br.readLine();
 			try {
 				return SpriteType.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				System.err.println("Invalid sprite type. Defaulting the Ship.");
+				System.err.println("Invalid sprite type. Defaulting to Ship.");
 				return SpriteType.Ship; // Return default value
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit(1);
+			return SpriteType.Ship; // Return default value in case of IOException
 		}
-		return SpriteType.Ship; // Default value in case of IOException
 	}
+
 
 
 	/**
