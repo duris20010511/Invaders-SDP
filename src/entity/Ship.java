@@ -70,23 +70,27 @@ public class Ship extends Entity {
 	}
 	/** Used to load Skins based on the skins res value. **/
 	private SpriteType loadSpriteTypeFromFile(String path) {
-		InputStream resourceStream = getClass().getResourceAsStream(path);
-		if (resourceStream == null) {
-			System.err.println("Sprite type file not found.");
-			return SpriteType.Ship; // Return default value in case of file not found
+		// Construct the path to the file in the "res" folder
+		String basePath = System.getProperty("user.dir") + File.separator + "res";
+		File file = new File(basePath, path); // Combine base path with relative path
+
+		if (!file.exists()) {
+			System.err.println("Sprite type file not found: " + file.getAbsolutePath());
+			return SpriteType.Ship; // Default value
 		}
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(resourceStream))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			String type = br.readLine();
 			try {
 				return SpriteType.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				System.err.println("Invalid sprite type. Defaulting to Ship.");
-				return SpriteType.Ship; // Return default value
+				System.err.println("Invalid sprite type in file. Defaulting to Ship.");
+				return SpriteType.Ship; // Default value
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return SpriteType.Ship; // Return default value in case of IOException
+			System.err.println("Error reading sprite type file.");
+			return SpriteType.Ship; // Default value in case of error
 		}
 	}
 
@@ -159,7 +163,7 @@ public class Ship extends Entity {
 		if (!this.destructionCooldown.checkFinished())
 			this.spriteType = SpriteType.ShipDestroyed;
 		else
-			this.spriteType = SpriteType.Ship;
+			this.spriteType = loadSpriteTypeFromFile("/skins");
 	}
 
 	/**
