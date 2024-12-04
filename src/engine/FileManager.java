@@ -912,7 +912,7 @@ public final class FileManager {
 	}
 
 
-	public void saveAchievement(Map<String, Boolean> achievement) throws IOException {
+	public void saveAchievements(Map<String, Boolean> achievement) throws IOException {
 		OutputStream outputStream = null;
 		BufferedWriter bufferedWriter = null;
 
@@ -921,7 +921,7 @@ public final class FileManager {
 			jarPath = URLDecoder.decode(jarPath, "UTF-8");
 
 			String achievementPath = new File(jarPath).getParent();
-			achievementPath += File.separator + "achievement";
+			achievementPath += File.separator + "achievement.txt";
 
 			File achievementFile = new File(achievementPath);
 
