@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 
 import CtrlS.RoundState;
 import CtrlS.Gem;
+import clove.Achievement;
 import entity.AddSign;
 import entity.Coin;
 import inventory_develop.Bomb;
@@ -62,6 +64,10 @@ public class DrawManager {
 
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, boolean[][]> spriteMap;
+	/** Skins Sprite types mapped to their images. */
+	private static Map<SpriteType, boolean[][]> skinMap;
+	private static List<SpriteType> skins;
+
 
 	/** Sprite types. */
 	public static enum SpriteType {
@@ -117,7 +123,8 @@ public class DrawManager {
 		AddSign,
 		/** Gem - Added by CtrlS */
 		Gem,
-        ItemSpeedUp, ItemSpeedSlow, Obstacle
+        ItemSpeedUp, ItemSpeedSlow, Obstacle,
+		Skin1,
 
 	};
 
@@ -164,6 +171,7 @@ public class DrawManager {
 			spriteMap.put(SpriteType.ItemPierce, new boolean[7][7]);
 			spriteMap.put(SpriteType.ItemSpeedUp, new boolean[9][9]);
 			spriteMap.put(SpriteType.ItemSpeedSlow, new boolean[9][9]);
+			spriteMap.put(SpriteType.Skin1, new boolean[13][8]); // by whatever
 
 			fileManager.loadSprite(spriteMap);
 			logger.info("Finished loading the sprites.");
@@ -173,12 +181,37 @@ public class DrawManager {
 			fontBig = fileManager.loadFont(24f);
 			logger.info("Finished loading the fonts.");
 
+			skinMap = new LinkedHashMap<SpriteType, boolean[][]>();
+			skinMap.put(SpriteType.Ship, spriteMap.get(SpriteType.Ship));
+			skinMap.put(SpriteType.Skin1, spriteMap.get(SpriteType.Skin1));
+
+
 		} catch (IOException e) {
 			logger.warning("Loading failed.");
 		} catch (FontFormatException e) {
 			logger.warning("Font formating failed.");
 		}
 	}
+
+	/**
+	 * Returns shared instance of FileManager.
+	 * @return
+	 */
+	public static List<Map.Entry<SpriteType, boolean[][]>> getSkinMap() {
+		return new ArrayList<>(skinMap.entrySet());
+	}
+
+	/**
+	 *
+	 */
+	public static List<SpriteType> getSkinTypes() {
+		List<SpriteType> skinTypes = new ArrayList<>();
+		for (Map.Entry<SpriteType, boolean[][]> entry : getSkinMap()) {
+			skinTypes.add(entry.getKey());
+		}
+		return skinTypes;
+	}
+
 
 	/**
 	 * Returns shared instance of DrawManager.
@@ -267,6 +300,36 @@ public class DrawManager {
 		}
 
 
+	}
+
+	/**
+	 * Draws an entity, using the apropiate image.
+	 *
+	 * @param entity
+	 *            Entity to be drawn.
+	 * @param positionX
+	 *            Coordinates for the left side of the image.
+	 * @param positionY
+	 *            Coordinates for the upper side of the image.
+	 */
+	public static void drawShipModel(final Entity entity, final int positionX,
+									 final int positionY) {
+		try {
+			boolean[][] image = spriteMap.get(entity.getSpriteType());
+
+			backBufferGraphics.setColor(entity.getColor());
+			int scale = 3; // Scale factor to make the entity size bigger
+			for (int i = 0; i < image.length; i++) {
+				for (int j = 0; j < image[i].length; j++) {
+					if (image[i][j]) {
+						backBufferGraphics.fillRect(positionX + i * scale, positionY + j * scale, scale, scale);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+			System.exit(1);
+		}
 	}
 
 	/**
@@ -387,11 +450,13 @@ public class DrawManager {
 		String highScoresString = "High scores";
 		String exitString = "exit";
 		String merchant = "Merchant";
+		String AchievementString = "Achievements";
 		String bulletCountString = String.format("bullet count up"); // Starter
 		String shipSpeedString = String.format("ship speed up"); // Starter
 		String attackSpeedString = String.format("attack speed up"); // Starter
 		String coinGainString = String.format("coin gain up"); // Starter
 		String merchantState = merchant;
+		String shipModel = "Ship Model";
 
         AddSign addSign = new AddSign();
 
@@ -457,13 +522,28 @@ public class DrawManager {
         drawCenteredRegularString(screen, RecentRecord, screen.getHeight()
                 / 4 * 2 + fontRegularMetrics.getHeight() * 6); // adjusted Height
 
+		if (option == 6)
+			backBufferGraphics.setColor(Color.GREEN);
+		else
+			backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, shipModel, screen.getHeight()
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 8); // adjusted Height
+
+		// Achievement
+		if (option == 7)
+			backBufferGraphics.setColor(Color.GREEN);
+		else
+			backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, AchievementString, screen.getHeight()
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 10);
+
         // Exit (Starter)
 		if (option == 0)
 			backBufferGraphics.setColor(Color.GREEN);
 		else
 			backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, exitString, screen.getHeight()
-				/ 4 * 2 + fontRegularMetrics.getHeight() * 10); // adjusted Height
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 12); // adjusted Height
 	}
 
 	/**
@@ -634,6 +714,21 @@ public class DrawManager {
 				screen.getHeight() / 5);
 	}
 
+	public void drawModelShipMenu(final Screen screen) {
+		String shipModelString = "Ship Model";
+		String instructionsString = "Press Space to select and return!";
+		String moveInstruction = "Arrow left and right to change model!";
+		backBufferGraphics.setColor(Color.GREEN);
+		drawCenteredBigString(screen, shipModelString, screen.getHeight() / 8);
+
+		backBufferGraphics.setColor(Color.GRAY);
+		drawCenteredRegularString(screen, instructionsString,
+				screen.getHeight() / 5);
+
+		backBufferGraphics.setColor(Color.BLUE);
+		drawCenteredRegularString(screen, moveInstruction, screen.getHeight() - fontRegularMetrics.getHeight() - 10);
+	}
+
 	/**
 	 * Draws high scores.
 	 *
@@ -699,6 +794,7 @@ public class DrawManager {
 			i++;
 		}
 	}
+
 
 
 	/**
@@ -968,4 +1064,41 @@ public class DrawManager {
 					+ Core.getUpgradeManager().whatMoney(count,number);
 		}
 	}
+
+	/**
+	 * Draw Achievement page Title
+	 */
+	public void drawAchievementTitle(final Screen screen){
+		String titleString = "Achievements";
+		String instructionString = "Press Space to return";
+
+		backBufferGraphics.setColor(Color.GREEN);
+		drawCenteredBigString(screen, titleString, screen.getHeight() / 8);
+
+		backBufferGraphics.setColor(Color.GRAY);
+		drawCenteredRegularString(screen, instructionString,
+				screen.getHeight() / 5);
+	}
+
+	/**
+	 * Draw a single achievement on the screen
+	 *
+	 * @param x
+	 *			x-coordinate
+	 * @param y
+	 * 			y-coordinate
+	 * @param achievement
+	 * 			achievement
+	 */
+	public static void drawAchievement(int x, int y, Achievement achievement){
+		String status = achievement.isCompleted() ? "[Unlocked]" : "[Locked]";
+		String name = achievement.getAchievementName();
+		String description = achievement.getAchievementDescription();
+		String text = String.format("%s %s - %s", status, name, description);
+
+		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setColor(Color.white);
+		backBufferGraphics.drawString(text, x, y);
+	}
+
 }
