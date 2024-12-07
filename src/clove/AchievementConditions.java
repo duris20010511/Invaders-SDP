@@ -112,7 +112,16 @@ public class AchievementConditions {
 
     // Have to check if the code right below works
     public void checkAllAchievements() {
-        boolean allCompleted = allAchievements.stream().allMatch(Achievement::isCompleted);
+        boolean allCompleted = true;
+        LOGGER.info("Checking all achievements...");
+
+        for (int i = 0; i < (allAchievements.size()-1); i++) {
+            Achievement achievement = allAchievements.get(i);
+
+            if (!achievement.isCompleted()) {
+                allCompleted = false;
+            }
+        }
         if (allCompleted) {
             completeAchievement(allAchievements.getLast());
         }
