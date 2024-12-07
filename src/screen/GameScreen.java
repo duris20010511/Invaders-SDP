@@ -312,10 +312,20 @@ public class GameScreen extends Screen {
 				boolean moveLeft = inputManager.isKeyDown(KeyEvent.VK_LEFT)
 						|| inputManager.isKeyDown(KeyEvent.VK_A);
 
+				// --- 상하 이동 (방향키 추가)
+				boolean moveUp = inputManager.isKeyDown(KeyEvent.VK_W)  // W 키는 위로 이동
+						|| inputManager.isKeyDown(KeyEvent.VK_UP);  // 방향키 위로 이동
+				boolean moveDown = inputManager.isKeyDown(KeyEvent.VK_S)  // S 키는 아래로 이동
+						|| inputManager.isKeyDown(KeyEvent.VK_DOWN);  // 방향키 아래로 이동
+
 				boolean isRightBorder = this.ship.getPositionX()
 						+ this.ship.getWidth() + this.ship.getSpeed() > this.width - 1;
 				boolean isLeftBorder = this.ship.getPositionX()
 						- this.ship.getSpeed() < 1;
+
+				boolean isTopBorder = this.ship.getPositionY() - this.ship.getSpeed() < 40;
+				boolean isBottomBorder = this.ship.getPositionY() + this.ship.getHeight()
+						+ this.ship.getSpeed() > this.height - 63;  // 하단 경계
 
 				if (moveRight && !isRightBorder) {
 					this.ship.moveRight();
@@ -325,6 +335,16 @@ public class GameScreen extends Screen {
 					this.ship.moveLeft();
 					this.backgroundMoveLeft = true;
 				}
+
+				// 상단 경계를 벗어나지 않도록 W 또는 방향키 위로 입력 시 위로 이동
+				if (moveUp && !isTopBorder) {
+					this.ship.moveUp();
+				}
+				// 하단 경계를 벗어나지 않도록 S 또는 방향키 아래로 입력 시 아래로 이동
+				if (moveDown && !isBottomBorder) {
+					this.ship.moveDown();
+				}
+
 				if (inputManager.isKeyDown(KeyEvent.VK_ENTER))
 					if (this.ship.shoot(this.bullets)) {
 						this.bulletsShot++;
@@ -367,27 +387,42 @@ public class GameScreen extends Screen {
 		cleanObstacles();
 		this.itemManager.cleanItems(); //by Enemy team
 
-		if (player2 != null) {
+		if (player2 != null && this.inputDelay.checkFinished()) {
 			// Player 2 movement and shooting
-			boolean moveRight2 = inputManager.isKeyDown(KeyEvent.VK_C);
-			boolean moveLeft2 = inputManager.isKeyDown(KeyEvent.VK_Z);
+			boolean moveRight2 = inputManager.isKeyDown(KeyEvent.VK_L);
+			boolean moveLeft2 = inputManager.isKeyDown(KeyEvent.VK_J);
 
-			if (moveRight2 && player2.getPositionX() + player2.getWidth() < width) {
-				player2.moveRight();
-			}
-			if (moveLeft2 && player2.getPositionX() > 0) {
-				player2.moveLeft();
-			}
-			if (inputManager.isKeyDown(KeyEvent.VK_X)) {
-				player2.shoot(bullets);
-			}
+			boolean moveUp2 = inputManager.isKeyDown(KeyEvent.VK_I);  // W 키는 위로 이동
+			boolean moveDown2 = inputManager.isKeyDown(KeyEvent.VK_K);  // S 키는 아래로 이동
+			if (!player2.isDestroyed()) {
+				if (moveRight2 && player2.getPositionX() + player2.getWidth() < width) {
+					player2.moveRight();
+				}
+				if (moveLeft2 && player2.getPositionX() > 0) {
+					player2.moveLeft();
+				}
 
-			// Player 2 bullet collision handling
-			TwoPlayerMode.handleBulletCollisionsForPlayer2(this.bullets, player2);
+				// Player 2의 위로 이동
+				if (moveUp2 && player2.getPositionY() - player2.getSpeed() >= 40) {  // 상단 경계 체크
+					player2.moveUp();
+				}
 
-			// 장애물과 아이템 상호작용 추가
-			TwoPlayerMode.handleObstacleCollisionsForPlayer2(this.obstacles, player2);
-			TwoPlayerMode.handleItemCollisionsForPlayer2(player2);
+				// Player 2의 아래로 이동
+				if (moveDown2 && player2.getPositionY() + player2.getHeight() + player2.getSpeed() <= height - 63) {  // 하단 경계 체크
+					player2.moveDown();
+				}
+
+				if (inputManager.isKeyDown(KeyEvent.VK_Z)) {
+					player2.shoot(bullets);
+				}
+
+				// Player 2 bullet collision handling
+				TwoPlayerMode.handleBulletCollisionsForPlayer2(this.bullets, player2);
+
+				// 장애물과 아이템 상호작용 추가
+				TwoPlayerMode.handleObstacleCollisionsForPlayer2(this.obstacles, player2);
+				TwoPlayerMode.handleItemCollisionsForPlayer2(player2);
+			}
 		}
 		draw();
 
