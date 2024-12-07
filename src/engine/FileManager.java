@@ -914,91 +914,91 @@ public final class FileManager {
 
 
 	public void saveAchievements(List<Achievement> achievements) throws IOException {
-		OutputStream outputStream = null;
-		BufferedWriter bufferedWriter = null;
+		String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		jarPath = URLDecoder.decode(jarPath, "UTF-8");
 
-		try {
-			String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-			jarPath = URLDecoder.decode(jarPath, "UTF-8");
+		String achievementsPath = new File(jarPath).getParent();
+		achievementsPath += File.separator;
+		achievementsPath += "achievements";
 
-			String achievementPath = new File(jarPath).getParent();
-			achievementPath += File.separator + "achievement.txt";
+		File achievementsFile = new File(achievementsPath);
 
-			File achievementFile = new File(achievementPath);
+		if (!achievementsFile.exists()) {
+			achievementsFile.createNewFile();
+		}
 
-			if (!achievementFile.exists()) {
-				achievementFile.createNewFile();
+		List<String> lines = new ArrayList<>();
+		String line;
+
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+				new FileInputStream(achievementsFile), Charset.forName("UTF-8")))) {
+			while ((line = bufferedReader.readLine()) != null) {
+				lines.add(line);
 			}
+		}
 
-			outputStream = new FileOutputStream(achievementFile);
-			bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")));
+		for (Achievement achievement : achievements) {
+			lines.add(EncryptionSupport.encrypt(achievement.toString())); // Encrypt the serialized achievement string
+		}
 
-			logger.info("Saving achievements.");
-
-			for (Achievement achievement : achievements) {
-				bufferedWriter.write(achievement.toString());
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+				new FileOutputStream(achievementsFile), Charset.forName("UTF-8")))) {
+			for (String l : lines) {
+				bufferedWriter.write(l);
 				bufferedWriter.newLine();
 			}
-		} finally {
-			if (bufferedWriter != null) {
-				bufferedWriter.close();
-			}
+			logger.info("Saving achievements.");
 		}
 	}
 
-	public static List<Achievement> loadAchievements() throws IOException {
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
 
+
+
+	public List<Achievement> loadAchievements() throws IOException {
 		List<Achievement> achievements = new ArrayList<>();
+		String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		jarPath = URLDecoder.decode(jarPath, "UTF-8");
 
-		try {
-			String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-			jarPath = URLDecoder.decode(jarPath, "UTF-8");
+		String achievementsPath = new File(jarPath).getParent();
+		achievementsPath += File.separator;
+		achievementsPath += "achievements";
 
-			String achievementsPath = new File(jarPath).getParent();
-			achievementsPath += File.separator;
-			achievementsPath += "achievements.txt";
+		File achievementsFile = new File(achievementsPath);
 
-			File achievementsFile = new File(achievementsPath);
+		if (!achievementsFile.exists()) {
+			logger.info("Achievements file not found, starting fresh.");
+			return achievements;
+		}
+		String line;
 
-			if (!achievementsFile.exists()) {
-				logger.info("Achievements file not found, starting fresh.");
-				return achievements;
-			}
-
-			inputStream = new FileInputStream(achievementsFile);
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
-
+		// Read the file's contents and decrypt each achievement
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+				new FileInputStream(achievementsFile), Charset.forName("UTF-8")))) {
 			logger.info("Loading achievements.");
 
-			String line;
 			while ((line = bufferedReader.readLine()) != null) {
-				Achievement achievement = AchievementFromString(line);
+				String decryptedLine = EncryptionSupport.decrypt(line);  // Decrypt each achievement string
+				Achievement achievement = AchievementFromString(decryptedLine);
 				if (achievement != null) {
 					achievements.add(achievement);
 				}
 			}
-
-		} finally {
-			if (bufferedReader != null)
-				bufferedReader.close();
 		}
-
 		return achievements;
 	}
 
 	private static Achievement AchievementFromString(String line) {
 		try {
+			// Remove "Achievement{" and "}"
 			line = line.replace("Achievement{", "").replace("}", "").trim();
 
+			// Split the string into its parts
 			String[] parts = line.split(",\\s*");
 
 			String achievementName = parts[0].split("=")[1].replace("'", "").trim();
 			String achievementDescription = parts[1].split("=")[1].replace("'", "").trim();
 			boolean isCompleted = Boolean.parseBoolean(parts[2].split("=")[1].trim());
 			Achievement.AchievementType achievementType = Achievement.AchievementType.valueOf(parts[3].split("=")[1].trim());
-
 
 			String requiredValueStr = parts[4].split("=")[1].trim();
 			int requiredValue = (requiredValueStr.isEmpty()) ? 0 : Integer.parseInt(requiredValueStr);
@@ -1013,6 +1013,5 @@ public final class FileManager {
 			e.printStackTrace();
 			return null;
 		}
-
 	}
 }

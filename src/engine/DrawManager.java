@@ -535,7 +535,7 @@ public class DrawManager {
 		else
 			backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, AchievementString, screen.getHeight()
-				/ 4 * 2 + fontRegularMetrics.getHeight() * 8);
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 10);
 
         // Exit (Starter)
 		if (option == 0)
@@ -543,7 +543,7 @@ public class DrawManager {
 		else
 			backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, exitString, screen.getHeight()
-				/ 4 * 2 + fontRegularMetrics.getHeight() * 10); // adjusted Height
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 12); // adjusted Height
 	}
 
 	/**

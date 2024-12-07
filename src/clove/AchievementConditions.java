@@ -42,8 +42,6 @@ public class AchievementConditions {
     private int enemiesKilledIn3Seconds = 0;
 
     public AchievementConditions() {
-        initializeAchievements();
-        fileManager = Core.getFileManager();
 
         try{
             this.stats = new Statistics();
@@ -62,10 +60,25 @@ public class AchievementConditions {
 
     public AchievementConditions(DrawManager drawManager) {
         this.drawManager = drawManager;
+        fileManager = Core.getFileManager();
         initializeAchievements();
     }
 
     public void initializeAchievements() {
+        try {
+            List<Achievement> loadedAchievements = fileManager.loadAchievements();
+            if (!loadedAchievements.isEmpty()) {
+                allAchievements.addAll(loadedAchievements);
+            } else {
+                addDefaultAchievements();
+            }
+        } catch (IOException e) {
+            LOGGER.warning("Couldn't load achievements!");
+            addDefaultAchievements();
+        }
+    }
+
+    private void addDefaultAchievements() {
 
         // TODO Some of the codes below are non-operational.(fastKillAchievement,trialAchievement) Will be updated if related record fuctions are added.
         allAchievements.add(new Achievement("Aerobatics","Maintain Maximum Life",3, Achievement.AchievementType.LIVES));
@@ -128,6 +141,7 @@ public class AchievementConditions {
             if (achievement.getType() == Achievement.AchievementType.KILLS) {
                 if (currentKills >= achievement.getRequiredValue() && !achievement.isCompleted()) {
                     completeAchievement(achievement);
+                    LOGGER.info("Complete: "+ achievement.toString());
                 }
             }
         }

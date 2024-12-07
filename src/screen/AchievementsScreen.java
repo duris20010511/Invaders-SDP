@@ -21,7 +21,7 @@ public class AchievementsScreen extends Screen {
     /** Time between changes in user selection. */
     private Cooldown selectionCooldown;
     /** Maximum number of achievements per page */
-    private static final int ACHIEVEMENTS_PER_PAGE = 10;
+    private static final int ACHIEVEMENTS_PER_PAGE = 13;
     /** Current page */
     private int currentPage;
     /** Total pages */
