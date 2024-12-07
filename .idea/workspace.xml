@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2d1df9e-7633-4932-824c-2c1f0ea58909" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/clove/Achievement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/clove/Achievement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/clove/AchievementConditions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/clove/AchievementConditions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/clove/AchievementManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/clove/AchievementManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/engine/DrawManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/engine/DrawManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/engine/FileManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/engine/FileManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/AchievementsScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/AchievementsScreen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/GameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/GameScreen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/screen/ScoreScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/screen/ScoreScreen.java" afterDir="false" />
-    </list>
+    <list default="true" id="c2d1df9e-7633-4932-824c-2c1f0ea58909" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +29,9 @@
   <component name="KubernetesApiProvider">{
     &quot;isMigrated&quot;: true
     }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo">{
     &quot;customColor&quot;: &quot;&quot;,
     &quot;associatedIndex&quot;: 6
@@ -49,13 +42,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-    "project.structure.side.proportion": "0.28390804",
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Application.Core.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;AchievementDemo&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/OSYSTUDY/241018/Invaders-SDP_TEAMstarter&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -93,17 +85,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="애플리케이션.Core" />
+        <item itemvalue="Application.Core" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.21829.142" />
-        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-IU-242.21829.142" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="애플리케이션 수준" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -130,9 +114,21 @@
       <workItem from="1728884400421" duration="1555000" />
       <workItem from="1728890242900" duration="37000" />
       <workItem from="1728890316138" duration="346000" />
-      <workItem from="1733227635167" duration="2581000" />
-      <workItem from="1733309295197" duration="6501000" />
-      <workItem from="1733317134006" duration="294000" />
+      <workItem from="1731329845028" duration="2738000" />
+      <workItem from="1731371427882" duration="4862000" />
+      <workItem from="1731389888542" duration="1626000" />
+      <workItem from="1731472161884" duration="120000" />
+      <workItem from="1731569439192" duration="1595000" />
+      <workItem from="1732175499522" duration="4131000" />
+      <workItem from="1732195392828" duration="3483000" />
+      <workItem from="1732235842561" duration="5994000" />
+      <workItem from="1732515152492" duration="3111000" />
+      <workItem from="1732579813811" duration="3718000" />
+      <workItem from="1732602942375" duration="2327000" />
+      <workItem from="1732792337485" duration="1843000" />
+      <workItem from="1732808073064" duration="1987000" />
+      <workItem from="1732835845441" duration="3264000" />
+      <workItem from="1732972622590" duration="1971000" />
     </task>
     <servers />
   </component>
@@ -151,6 +147,11 @@
     </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="d8a76686-41bf-4f81-bdf0-ee761e77b1ae" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
@@ -158,7 +159,39 @@
             <State />
           </value>
         </entry>
+        <entry key="d8a76686-41bf-4f81-bdf0-ee761e77b1ae">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:C:/dev/hanyang/2-2/SoftwareDevelop/Invaders-SDP/src/inventory_develop" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="engine.DrawManager" memberName="background" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>

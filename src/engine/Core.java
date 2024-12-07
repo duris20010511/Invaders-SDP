@@ -145,6 +145,36 @@ public final class Core {
 		GameState gameState;
 		RoundState roundState;
 
+		enum RETCODE {
+			TITLE(1),
+			GAME(2),
+			HIGHSCORE(3),
+			TWOPLAYER(4),
+			RECORD(5),
+			SHIPMODEL(6),
+            ACHIEVEMENT(7);
+
+			private final int code;
+
+			RETCODE(int code) {
+				this.code = code;
+			}
+
+			public int getCode() {
+				return code;
+			}
+
+			public static RETCODE fromCode(int code) {
+				for (RETCODE r : RETCODE.values()) {
+					if (r.code == code) {
+						return r;
+					}
+				}
+				throw new IllegalArgumentException("Invalid Code!");
+			}
+		}
+
+
 		int returnCode = 1;
 		do {
 			// Add playtime parameter - Soomin Lee / TeamHUD
@@ -152,8 +182,9 @@ public final class Core {
 			// Add coinItemsCollected parameter - Ctrl S
 			gameState = new GameState(1, 0
 					, MAX_LIVES, 0,0, 0, 0, 0, 0, 0, 0);
-			switch (returnCode) {
-			case 1:
+			RETCODE retcodeEnum = RETCODE.fromCode(returnCode);
+			switch (retcodeEnum) {
+			case TITLE:
 				// Main menu.
                 currentScreen = new TitleScreen(width, height, FPS);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -161,13 +192,12 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing title screen.");
 				break;
-			case 2:
+			case GAME:
 				// Game & score.
 				LOGGER.info("Starting inGameBGM");
 				// Sound Operator
 				sm.playES("start_button_ES");
 				sm.playBGM("inGame_bgm");
-
 
 				do {
 					// One extra live every few levels.
@@ -183,6 +213,7 @@ public final class Core {
 							+ " game screen at " + FPS + " fps.");
 					frame.setScreen(currentScreen);
 					LOGGER.info("Closing game screen.");
+
 
 					achievementManager.updateAchievements(currentScreen); // TEAM CLOVER : Achievement
 
@@ -226,7 +257,6 @@ public final class Core {
 								+ " receipt screen at " + FPS + " fps.");
 						frame.setScreen(currentScreen);
 						LOGGER.info("Closing receiptScreen.");
-
 					}
 
                     if (achievementManager != null) { // TEAM CLOVER : Added code
@@ -249,9 +279,8 @@ public final class Core {
 				currentScreen = new ScoreScreen(width, height, FPS, gameState);
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
-
 				break;
-			case 3:
+			case HIGHSCORE:
 				// High scores.
 				currentScreen = new HighScoreScreen(width, height, FPS);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -259,7 +288,7 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing high score screen.");
 				break;
-			case 4:
+			case TWOPLAYER:
 				LOGGER.info("Starting inGameBGM");
 				// Sound Operator
 				sm.playES("start_button_ES");
@@ -359,7 +388,7 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing score screen.");
 				break;
-			case 5: // 7 -> 5 replaced by Starter
+			case RECORD: // 7 -> 5 replaced by Starter
 				// Recent Records.
 				currentScreen = new RecordScreen(width, height, FPS);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
@@ -367,7 +396,15 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing recent record screen.");
 				break;
-			case 6:
+			case SHIPMODEL:
+				// Ship Model.
+				currentScreen = new ShipModelScreen(width, height, FPS);
+				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
+						+ " ship model screen at " + FPS + " fps.");
+				returnCode = frame.setScreen(currentScreen);
+				LOGGER.info("Closing ship model screen.");
+				break;
+            case ACHIEVEMENT:
 				// Achievement page
 				currentScreen = new AchievementsScreen(width, height, FPS, achievementManager);
 				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT + "achievements screen at " + FPS + " fps.");
@@ -394,7 +431,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the logger.
-	 *
+	 * 
 	 * @return Application logger.
 	 */
 	public static Logger getLogger() {
@@ -403,7 +440,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the drawing manager.
-	 *
+	 * 
 	 * @return Application draw manager.
 	 */
 	public static DrawManager getDrawManager() {
@@ -412,7 +449,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the input manager.
-	 *
+	 * 
 	 * @return Application input manager.
 	 */
 	public static InputManager getInputManager() {
@@ -421,7 +458,7 @@ public final class Core {
 
 	/**
 	 * Controls access to the file manager.
-	 *
+	 * 
 	 * @return Application file manager.
 	 */
 	public static FileManager getFileManager() {
@@ -430,7 +467,7 @@ public final class Core {
 
 	/**
 	 * Controls creation of new cooldowns.
-	 *
+	 * 
 	 * @param milliseconds
 	 *            Duration of the cooldown.
 	 * @return A new cooldown.
@@ -441,7 +478,7 @@ public final class Core {
 
 	/**
 	 * Controls creation of new cooldowns with variance.
-	 *
+	 * 
 	 * @param milliseconds
 	 *            Duration of the cooldown.
 	 * @param variance
