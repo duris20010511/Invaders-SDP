@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.logging.Logger;
 import CtrlS.EncryptionSupport;
+import clove.Achievement;
 import engine.DrawManager.SpriteType;
 
 import clove.Statistics; //Team Clove
@@ -595,7 +596,7 @@ public final class FileManager {
 			long totalPlaytime = Integer.parseInt(properties.getProperty("totalPlaytime"));
 
 			stat = new Statistics(highestLevel, totalBulletsShot, totalShipsDestroyed, shipsDestructionStreak,
-					playedGameNumber, clearAchievementNumber, totalPlaytime);
+					playedGameNumber,clearAchievementNumber, totalPlaytime);
 
 		} finally {
 			if(inputStream != null){
@@ -909,5 +910,108 @@ public final class FileManager {
 		}
 
 		return defaultProperties;
+	}
+
+
+	public void saveAchievements(List<Achievement> achievements) throws IOException {
+		String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		jarPath = URLDecoder.decode(jarPath, "UTF-8");
+
+		String achievementsPath = new File(jarPath).getParent();
+		achievementsPath += File.separator;
+		achievementsPath += "achievements";
+
+		File achievementsFile = new File(achievementsPath);
+
+		if (!achievementsFile.exists()) {
+			achievementsFile.createNewFile();
+		}
+
+		List<String> lines = new ArrayList<>();
+		String line;
+
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+				new FileInputStream(achievementsFile), Charset.forName("UTF-8")))) {
+			while ((line = bufferedReader.readLine()) != null) {
+				lines.add(line);
+			}
+		}
+
+		for (Achievement achievement : achievements) {
+			lines.add(EncryptionSupport.encrypt(achievement.toString())); // Encrypt the serialized achievement string
+		}
+
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+				new FileOutputStream(achievementsFile), Charset.forName("UTF-8")))) {
+			for (String l : lines) {
+				bufferedWriter.write(l);
+				bufferedWriter.newLine();
+			}
+			logger.info("Saving achievements.");
+		}
+	}
+
+
+
+
+	public List<Achievement> loadAchievements() throws IOException {
+		List<Achievement> achievements = new ArrayList<>();
+		String jarPath = FileManager.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		jarPath = URLDecoder.decode(jarPath, "UTF-8");
+
+		String achievementsPath = new File(jarPath).getParent();
+		achievementsPath += File.separator;
+		achievementsPath += "achievements";
+
+		File achievementsFile = new File(achievementsPath);
+
+		if (!achievementsFile.exists()) {
+			logger.info("Achievements file not found, starting fresh.");
+			return achievements;
+		}
+		String line;
+
+		// Read the file's contents and decrypt each achievement
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+				new FileInputStream(achievementsFile), Charset.forName("UTF-8")))) {
+			logger.info("Loading achievements.");
+
+			while ((line = bufferedReader.readLine()) != null) {
+				String decryptedLine = EncryptionSupport.decrypt(line);  // Decrypt each achievement string
+				Achievement achievement = AchievementFromString(decryptedLine);
+				if (achievement != null) {
+					achievements.add(achievement);
+				}
+			}
+		}
+		return achievements;
+	}
+
+	private static Achievement AchievementFromString(String line) {
+		try {
+			// Remove "Achievement{" and "}"
+			line = line.replace("Achievement{", "").replace("}", "").trim();
+
+			// Split the string into its parts
+			String[] parts = line.split(",\\s*");
+
+			String achievementName = parts[0].split("=")[1].replace("'", "").trim();
+			String achievementDescription = parts[1].split("=")[1].replace("'", "").trim();
+			boolean isCompleted = Boolean.parseBoolean(parts[2].split("=")[1].trim());
+			Achievement.AchievementType achievementType = Achievement.AchievementType.valueOf(parts[3].split("=")[1].trim());
+
+			String requiredValueStr = parts[4].split("=")[1].trim();
+			int requiredValue = (requiredValueStr.isEmpty()) ? 0 : Integer.parseInt(requiredValueStr);
+
+			String gemStr = parts[5].split("=")[1].trim();
+			int gem = (gemStr.isEmpty()) ? 0 : Integer.parseInt(gemStr);
+
+			Achievement achievement = new Achievement(achievementName, achievementDescription, requiredValue, achievementType, gem);
+			achievement.setCompleted(isCompleted);
+			return achievement;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import CtrlS.RoundState;
 import CtrlS.Gem;
+import clove.Achievement;
 import entity.AddSign;
 import entity.Coin;
 import inventory_develop.Bomb;
@@ -60,6 +61,7 @@ public class DrawManager {
 	/** ###TEAM INTERNATIONAL ### */
 	private Background background;
 	private BufferedImage backgroundImage;
+
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, boolean[][]> spriteMap;
 	/** Skins Sprite types mapped to their images. */
@@ -448,6 +450,7 @@ public class DrawManager {
 		String highScoresString = "High scores";
 		String exitString = "exit";
 		String merchant = "Merchant";
+		String AchievementString = "Achievements";
 		String bulletCountString = String.format("bullet count up"); // Starter
 		String shipSpeedString = String.format("ship speed up"); // Starter
 		String attackSpeedString = String.format("attack speed up"); // Starter
@@ -526,13 +529,21 @@ public class DrawManager {
 		drawCenteredRegularString(screen, shipModel, screen.getHeight()
 				/ 4 * 2 + fontRegularMetrics.getHeight() * 8); // adjusted Height
 
+		// Achievement
+		if (option == 7)
+			backBufferGraphics.setColor(Color.GREEN);
+		else
+			backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, AchievementString, screen.getHeight()
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 10);
+
         // Exit (Starter)
 		if (option == 0)
 			backBufferGraphics.setColor(Color.GREEN);
 		else
 			backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, exitString, screen.getHeight()
-				/ 4 * 2 + fontRegularMetrics.getHeight() * 10); // adjusted Height
+				/ 4 * 2 + fontRegularMetrics.getHeight() * 12); // adjusted Height
 	}
 
 	/**
@@ -1053,4 +1064,41 @@ public class DrawManager {
 					+ Core.getUpgradeManager().whatMoney(count,number);
 		}
 	}
+
+	/**
+	 * Draw Achievement page Title
+	 */
+	public void drawAchievementTitle(final Screen screen){
+		String titleString = "Achievements";
+		String instructionString = "Press Space to return";
+
+		backBufferGraphics.setColor(Color.GREEN);
+		drawCenteredBigString(screen, titleString, screen.getHeight() / 8);
+
+		backBufferGraphics.setColor(Color.GRAY);
+		drawCenteredRegularString(screen, instructionString,
+				screen.getHeight() / 5);
+	}
+
+	/**
+	 * Draw a single achievement on the screen
+	 *
+	 * @param x
+	 *			x-coordinate
+	 * @param y
+	 * 			y-coordinate
+	 * @param achievement
+	 * 			achievement
+	 */
+	public static void drawAchievement(int x, int y, Achievement achievement){
+		String status = achievement.isCompleted() ? "[Unlocked]" : "[Locked]";
+		String name = achievement.getAchievementName();
+		String description = achievement.getAchievementDescription();
+		String text = String.format("%s %s - %s", status, name, description);
+
+		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.setColor(Color.white);
+		backBufferGraphics.drawString(text, x, y);
+	}
+
 }

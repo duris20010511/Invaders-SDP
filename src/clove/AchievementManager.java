@@ -3,9 +3,12 @@ package clove;
 import engine.DrawManager;
 import screen.Screen;
 
+import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 // TODO : Replace Object to Achievement Class
 // Fixed, need testing
@@ -13,6 +16,7 @@ public class AchievementManager {
     /*
         Variables
      */
+    private final Logger LOGGER = Logger.getLogger(AchievementManager.class.getName());
     private HashMap<Achievement, Boolean> achievementMap; // Object -> Achievement
     private ArrayList<AchievementChangedCallback> achievementChangedCallbacks;
 
@@ -20,13 +24,33 @@ public class AchievementManager {
 
     public AchievementManager(DrawManager drawManager) {
         this.achievementConditions = new AchievementConditions(drawManager);
+        this.achievementChangedCallbacks = new ArrayList<>();
     }
 
     public void updateAchievements(Screen screen) {
-        System.out.println("Updating achievements...");
+        LOGGER.info("Updating achievements...");
 
         achievementConditions.checkAllAchievements();
     }
+    // 게임 시작, FastKill 설정
+    public void onGameStart() {
+        if (achievementConditions != null) {
+            achievementConditions.startFastKillCheck();
+            LOGGER.info("Fast kill check started.");
+        }
+    }
+    // 게임 종료
+    public void onGameEnd() {
+        if (achievementConditions != null) {
+            achievementConditions.stopFastKillCheck();
+            LOGGER.info("Fast kill check stopped.");
+        }
+    }
+
+
+
+
+
     /*
         Callbacks
      */
@@ -46,10 +70,7 @@ public class AchievementManager {
     /*
         Declare
      */
-    public AchievementManager() { // HashMap<Achievement, Boolean>으로 초기화
-        achievementMap = new HashMap<>();
-        achievementChangedCallbacks = new ArrayList<>();
-    }
+
 
     /*
         Functions
@@ -78,7 +99,7 @@ public class AchievementManager {
         if(!hasAchivement(achievement)){
             // TODO : Output a notification (or log) that setting an achievement failed
             //Completed writing log output code, needs testing
-            System.out.println("Failed to set achievement: " + achievement.getAchievementName()); // 로그 추가
+            LOGGER.warning("Failed to set achievement: " + achievement.getAchievementName()); // 로그 추가
             return false;
         }
         achievementMap.replace(achievement, completed);
@@ -100,9 +121,15 @@ public class AchievementManager {
 
     public boolean completeAchievement(Achievement achievement) { // Added Code
         if (!achievement.isCompleted()) {
-            achievement.completeAchievement();
+            achievement.CompleteAchievement();
             return setAchievementValue(achievement, true);
         }
         return false;
     }
+
+    public List<Achievement> getAllAchievements() {
+        return achievementConditions.getAllAchievements();
+    }
+
+
 }

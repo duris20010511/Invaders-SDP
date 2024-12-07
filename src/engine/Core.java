@@ -26,9 +26,9 @@ import twoplayermode.TwoPlayerMode;
 
 /**
  * Implements core game logic.
- * 
+ *
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
- * 
+ *
  */
 public final class Core {
 
@@ -45,7 +45,7 @@ public final class Core {
 	private static final int EXTRA_LIFE_FRECUENCY = 3;
 	/** Total number of levels. */
 	public static final int NUM_LEVELS = 7; // TEAM CLOVER : Fixed NUM_LEVELS from privated to public for usage in achievement
-	
+
 	/** Difficulty settings for level 1. */
 	private static final GameSettings SETTINGS_LEVEL_1 =
 			new GameSettings(5, 4, 60, 2000, 1);
@@ -67,7 +67,7 @@ public final class Core {
 	/** Difficulty settings for level 7. */
 	private static final GameSettings SETTINGS_LEVEL_7 =
 			new GameSettings(8, 7, 2, 500, 1);
-	
+
 	/** Frame to draw the screen on. */
 	private static Frame frame;
 	/** Screen currently shown. */
@@ -87,7 +87,7 @@ public final class Core {
 
 	/**
 	 * Test implementation.
-	 * 
+	 *
 	 * @param args
 	 *            Program args, ignored.
 	 */
@@ -108,9 +108,8 @@ public final class Core {
 			LOGGER.setLevel(Level.ALL);
 
 			// TEAM CLOVER : Added log to check if function is working
-			System.out.println("Initializing AchievementManager...");
 			achievementManager = new AchievementManager(DrawManager.getInstance());
-			System.out.println("AchievementManager initialized!");
+			LOGGER.info("AchievementManager initialized!");
 
 			// CtrlS: Make instance of Upgrade Manager
 			Core.getUpgradeManager();
@@ -142,7 +141,7 @@ public final class Core {
 		gameSettings.add(SETTINGS_LEVEL_5);
 		gameSettings.add(SETTINGS_LEVEL_6);
 		gameSettings.add(SETTINGS_LEVEL_7);
-		
+
 		GameState gameState;
 		RoundState roundState;
 
@@ -152,7 +151,8 @@ public final class Core {
 			HIGHSCORE(3),
 			TWOPLAYER(4),
 			RECORD(5),
-			SHIPMODEL(6);
+			SHIPMODEL(6),
+            ACHIEVEMENT(7);
 
 			private final int code;
 
@@ -404,6 +404,13 @@ public final class Core {
 				returnCode = frame.setScreen(currentScreen);
 				LOGGER.info("Closing ship model screen.");
 				break;
+            case ACHIEVEMENT:
+				// Achievement page
+				currentScreen = new AchievementsScreen(width, height, FPS, achievementManager);
+				LOGGER.info("Starting " + WIDTH + "x" + HEIGHT + "achievements screen at " + FPS + " fps.");
+				returnCode = frame.setScreen(currentScreen);
+				LOGGER.info("Closing achievements screen.");
+
 			default:
 				break;
 			}
