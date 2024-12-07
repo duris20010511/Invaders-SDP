@@ -30,9 +30,9 @@ import twoplayermode.TwoPlayerMode;
 
 /**
  * Implements the game screen, where the action happens.
- * 
+ *
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
- * 
+ *
  */
 public class GameScreen extends Screen {
 
@@ -94,10 +94,10 @@ public class GameScreen extends Screen {
 	/** Checks if a bonus life is received. */
 	private boolean bonusLife;
 	/**
-	* Added by the Level Design team
-	*
-	* Counts the number of waves destroyed
-	* **/
+	 * Added by the Level Design team
+	 *
+	 * Counts the number of waves destroyed
+	 * **/
 	private int waveCounter;
 
 	/** ### TEAM INTERNATIONAL ### */
@@ -167,8 +167,8 @@ public class GameScreen extends Screen {
 	 *            Frames per second, frame rate at which the game is run.
 	 */
 	public GameScreen(final GameState gameState,
-			final GameSettings gameSettings, final boolean bonusLife,
-			final int width, final int height, final int fps) {
+					  final GameSettings gameSettings, final boolean bonusLife,
+					  final int width, final int height, final int fps) {
 		super(width, height, fps);
 
 		this.gameSettings = gameSettings;
@@ -194,10 +194,10 @@ public class GameScreen extends Screen {
 		this.fastKill = 0;
 
 		/**
-		* Added by the Level Design team
-		*
-		* Sets the wave counter
-		* **/
+		 * Added by the Level Design team
+		 *
+		 * Sets the wave counter
+		 * **/
 		this.waveCounter = 1;
 
 		// Soomin Lee / TeamHUD
@@ -312,10 +312,20 @@ public class GameScreen extends Screen {
 				boolean moveLeft = inputManager.isKeyDown(KeyEvent.VK_LEFT)
 						|| inputManager.isKeyDown(KeyEvent.VK_A);
 
+				// --- 상하 이동 (방향키 추가)
+				boolean moveUp = inputManager.isKeyDown(KeyEvent.VK_W)  // W 키는 위로 이동
+						|| inputManager.isKeyDown(KeyEvent.VK_UP);  // 방향키 위로 이동
+				boolean moveDown = inputManager.isKeyDown(KeyEvent.VK_S)  // S 키는 아래로 이동
+						|| inputManager.isKeyDown(KeyEvent.VK_DOWN);  // 방향키 아래로 이동
+
 				boolean isRightBorder = this.ship.getPositionX()
 						+ this.ship.getWidth() + this.ship.getSpeed() > this.width - 1;
 				boolean isLeftBorder = this.ship.getPositionX()
 						- this.ship.getSpeed() < 1;
+
+				boolean isTopBorder = this.ship.getPositionY() - this.ship.getSpeed() < 40; // 상단 경계
+				boolean isBottomBorder = this.ship.getPositionY() + this.ship.getHeight()
+						+ this.ship.getSpeed() > this.height - 63;  // 하단 경계
 
 				if (moveRight && !isRightBorder) {
 					this.ship.moveRight();
@@ -325,6 +335,16 @@ public class GameScreen extends Screen {
 					this.ship.moveLeft();
 					this.backgroundMoveLeft = true;
 				}
+
+				// 상단 경계를 벗어나지 않도록 W 또는 방향키 위로 입력 시 위로 이동
+				if (moveUp && !isTopBorder) {
+					this.ship.moveUp();
+				}
+				// 하단 경계를 벗어나지 않도록 S 또는 방향키 아래로 입력 시 아래로 이동
+				if (moveDown && !isBottomBorder) {
+					this.ship.moveDown();
+				}
+
 				if (inputManager.isKeyDown(KeyEvent.VK_ENTER))
 					if (this.ship.shoot(this.bullets)) {
 						this.bulletsShot++;
@@ -367,10 +387,13 @@ public class GameScreen extends Screen {
 		cleanObstacles();
 		this.itemManager.cleanItems(); //by Enemy team
 
-		if (player2 != null) {
+		if (player2 != null && this.inputDelay.checkFinished()) {
 			// Player 2 movement and shooting
-			boolean moveRight2 = inputManager.isKeyDown(KeyEvent.VK_C);
-			boolean moveLeft2 = inputManager.isKeyDown(KeyEvent.VK_Z);
+			boolean moveRight2 = inputManager.isKeyDown(KeyEvent.VK_L);
+			boolean moveLeft2 = inputManager.isKeyDown(KeyEvent.VK_J);
+
+			boolean moveUp2 = inputManager.isKeyDown(KeyEvent.VK_I);  // W 키는 위로 이동
+			boolean moveDown2 = inputManager.isKeyDown(KeyEvent.VK_K);  // S 키는 아래로 이동
 
 			if (moveRight2 && player2.getPositionX() + player2.getWidth() < width) {
 				player2.moveRight();
@@ -378,7 +401,18 @@ public class GameScreen extends Screen {
 			if (moveLeft2 && player2.getPositionX() > 0) {
 				player2.moveLeft();
 			}
-			if (inputManager.isKeyDown(KeyEvent.VK_X)) {
+
+			// Player 2의 위로 이동
+			if (moveUp2 && player2.getPositionY() - player2.getSpeed() >= 40) {  // 상단 경계 체크
+				player2.moveUp();
+			}
+
+			// Player 2의 아래로 이동
+			if (moveDown2 && player2.getPositionY() + player2.getHeight() + player2.getSpeed() <= height - 63) {  // 하단 경계 체크
+				player2.moveDown();
+			}
+
+			if (inputManager.isKeyDown(KeyEvent.VK_Z)) {
 				player2.shoot(bullets);
 			}
 
@@ -392,12 +426,12 @@ public class GameScreen extends Screen {
 		draw();
 
 		/**
-		* Added by the Level Design team and edit by team Enemy
-		* Changed the conditions for the game to end  by team Enemy
-		*
-		* Counts and checks if the number of waves destroyed match the intended number of waves for this level
-		* Spawn another wave
-		**/
+		 * Added by the Level Design team and edit by team Enemy
+		 * Changed the conditions for the game to end  by team Enemy
+		 *
+		 * Counts and checks if the number of waves destroyed match the intended number of waves for this level
+		 * Spawn another wave
+		 **/
 		if (getRemainingEnemies() == 0 && waveCounter < this.gameSettings.getWavesNumber()) {
 
 			waveCounter++;
@@ -406,15 +440,15 @@ public class GameScreen extends Screen {
 		}
 
 		/**
-		* Wave counter condition added by the Level Design team*
-		* Changed the conditions for the game to end  by team Enemy
-		*
-		* Checks if the intended number of waves for this level was destroyed
-		* **/
+		 * Wave counter condition added by the Level Design team*
+		 * Changed the conditions for the game to end  by team Enemy
+		 *
+		 * Checks if the intended number of waves for this level was destroyed
+		 * **/
 		if ((getRemainingEnemies() == 0
-		&& !this.levelFinished
-		&& waveCounter == this.gameSettings.getWavesNumber())
-		|| (this.lives == 0)
+				&& !this.levelFinished
+				&& waveCounter == this.gameSettings.getWavesNumber())
+				|| (this.lives == 0)
 		) {
 			this.levelFinished = true;
 			//this.screenFinishedCooldown.reset(); It works now -- With love, Level Design Team
@@ -423,9 +457,10 @@ public class GameScreen extends Screen {
 		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
 			//this.logger.info("Final Playtime: " + playTime + " seconds");    //clove
 			achievementConditions.stopFastKillCheck();
-			achievementConditions.checkNoDeathAchievements(lives);
-            try { //Team Clove
-
+			achievementConditions.checkNoDeathAchievements(lives
+                                                     
+			achievementConditions.score(score);
+			try { //Team Clove
 
 				statistics.comHighestLevel(level);
 				statistics.addBulletShot(bulletsShot);
@@ -439,12 +474,12 @@ public class GameScreen extends Screen {
 				achievementConditions.score(score);
 
 
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
-            this.isRunning = false;
+			this.isRunning = false;
 		}
 	}
 
@@ -496,7 +531,7 @@ public class GameScreen extends Screen {
 //		drawManager.drawScore(this, this.scoreManager.getAccumulatedScore());    //clove -> edit by jesung ko - TeamHUD(to udjust score)
 //		drawManager.drawScore(this, this.score); // by jesung ko - TeamHUD
 		DrawManagerImpl.drawScore2(this,this.score); // by jesung ko - TeamHUD
-		drawManager.drawLives(this, this.lives);	
+		drawManager.drawLives(this, this.lives);
 		drawManager.drawHorizontalLine(this, SEPARATION_LINE_HEIGHT - 1);
 		DrawManagerImpl.drawRemainingEnemies(this, getRemainingEnemies()); // by HUD team SeungYun
 		DrawManagerImpl.drawLevel(this, this.level);
@@ -518,19 +553,19 @@ public class GameScreen extends Screen {
 		// Countdown to game start.
 		if (!this.inputDelay.checkFinished()) {
 			int countdown = (int) ((INPUT_DELAY
-			- (System.currentTimeMillis()
-			- this.gameStartTime)) / 1000);
+					- (System.currentTimeMillis()
+					- this.gameStartTime)) / 1000);
 
 			/**
-			* Wave counter condition added by the Level Design team
-			*
-			* Display the wave number instead of the level number
-			* **/
+			 * Wave counter condition added by the Level Design team
+			 *
+			 * Display the wave number instead of the level number
+			 * **/
 			if (waveCounter != 1) {
 				drawManager.drawWave(this, waveCounter, countdown);
 			} else {
 				drawManager.drawCountDown(this, this.level, countdown,
-				this.bonusLife);
+						this.bonusLife);
 			}
 
 			drawManager.drawHorizontalLine(this, this.height / 2 - this.height
@@ -557,7 +592,7 @@ public class GameScreen extends Screen {
 			bullet.update();
 			if (bullet.getPositionY() < SEPARATION_LINE_HEIGHT
 					|| bullet.getPositionY() > this.height-70) // ko jesung / HUD team
-                {
+			{
 				//Ctrl-S : set true of CheckCount if the bullet is planned to recycle.
 				bullet.setCheckCount(true);
 				recyclable.add(bullet);
@@ -568,14 +603,14 @@ public class GameScreen extends Screen {
 	}
 
 	/**
-	* Clean obstacles that go off screen.
-	*/
+	 * Clean obstacles that go off screen.
+	 */
 	private void cleanObstacles() { //added by Level Design Team
 		Set<Obstacle> removableObstacles = new HashSet<>();
 		for (Obstacle obstacle : this.obstacles) {
 			obstacle.update(this.level);
 			if (obstacle.getPositionY() > this.height - 70 ||
-			obstacle.getPositionY() < SEPARATION_LINE_HEIGHT) {
+					obstacle.getPositionY() < SEPARATION_LINE_HEIGHT) {
 				removableObstacles.add(obstacle);
 			}
 		}
@@ -668,8 +703,8 @@ public class GameScreen extends Screen {
 							this.shipsDestroyed++;
 						}
 
-            this.scoreManager.addScore(feverScore); //clove
-            this.score += CntAndPnt[1];
+						this.scoreManager.addScore(feverScore); //clove
+						this.score += CntAndPnt[1];
 
 						// CtrlS - If collision occur then check the bullet can process
 						if (!processedFireBullet.contains(bullet.getFire_id())) {
@@ -706,7 +741,7 @@ public class GameScreen extends Screen {
 						&& !this.enemyShipSpecial.isDestroyed()
 						&& checkCollision(bullet, this.enemyShipSpecial)) {
 					int feverSpecialScore = enemyShipSpecial.getPointValue();
-          			// inventory - Score bonus when acquiring fever items
+					// inventory - Score bonus when acquiring fever items
 					if (feverTimeItem.isActive()) { feverSpecialScore *= 10; } //TEAM CLOVE //Team inventory
 
 					// CtrlS - If collision occur then check the bullet can process
