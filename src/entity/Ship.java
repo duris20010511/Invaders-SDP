@@ -113,17 +113,6 @@ public class Ship extends Entity {
 		this.positionX -= growth.getMoveSpeed(); // Use PlayerGrowth for movement speed
 	} //Edit by Enemy
 
-
-
-	public final void moveUp() {
-		this.positionY -= growth.getMoveSpeed(); // 위로 이동
-	}
-
-	public final void moveDown() {
-		this.positionY += growth.getMoveSpeed(); // 아래로 이동
-	}
-
-
 	/**
 	 * Shoots a bullet upwards.
 	 *
@@ -234,7 +223,7 @@ public class Ship extends Entity {
 	public final double getSpeed() {
 		return growth.getMoveSpeed();
 	}
-
+	
 	/**
 	 * Calculates and returns the bullet speed in Pixels per frame.
 	 *
