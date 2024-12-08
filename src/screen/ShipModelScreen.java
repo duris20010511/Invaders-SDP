@@ -21,13 +21,13 @@ import static engine.DrawManager.getSkinTypes;
 public class ShipModelScreen extends Screen {
 
     /** List of skins (ship models). */
-    private List<SpriteType> skins;
+    public List<SpriteType> skins;
     /** Milliseconds between changes in user selection. */
     private static final int SELECTION_TIME = 200;
     /** Time between changes in user selection. */
     private Cooldown selectionCooldown;
     /** Current page (selected skin index). */
-    private int currentPage;
+    public int currentPage;
 
     /**
      * Constructor, establishes the properties of the screen.
@@ -89,7 +89,7 @@ public class ShipModelScreen extends Screen {
     /**
      * Saves the currently selected SpriteType to a file named "skins" in the "res" directory.
      */
-    private void saveSelectedSpriteType() {
+    public void saveSelectedSpriteType() {
         if (skins == null || skins.isEmpty()) {
             return; // No skins to save
         }
@@ -120,7 +120,7 @@ public class ShipModelScreen extends Screen {
     /**
      * Moves to the next page of skins, if available.
      */
-    private void nextPage() {
+    public void nextPage() {
         if (skins != null && !skins.isEmpty()) {
             currentPage = (currentPage + 1) % skins.size(); // Wrap to first skin
         }
@@ -129,7 +129,7 @@ public class ShipModelScreen extends Screen {
     /**
      * Moves to the previous page of skins, if available.
      */
-    private void previousPage() {
+    public void previousPage() {
         if (skins != null && !skins.isEmpty()) {
             currentPage = (currentPage - 1 + skins.size()) % skins.size(); // Wrap to last skin
         }
