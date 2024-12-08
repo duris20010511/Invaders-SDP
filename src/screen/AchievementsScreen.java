@@ -135,7 +135,7 @@ public class AchievementsScreen extends Screen {
     /**
      * Draws the achievements on the screen.
      */
-    private void draw() {
+    void draw() {
         drawManager.initDrawing(this);
 
         // Title
