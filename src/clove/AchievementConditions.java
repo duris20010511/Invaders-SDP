@@ -120,6 +120,7 @@ public class AchievementConditions {
 
             if (!achievement.isCompleted()) {
                 allCompleted = false;
+                break;
             }
         }
         if (allCompleted) {
