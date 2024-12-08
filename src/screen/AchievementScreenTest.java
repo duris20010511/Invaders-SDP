@@ -26,14 +26,25 @@ public class AchievementScreenTest {
             @Override
             public List<Achievement> getAllAchievements() {
                 List<Achievement> achievements = new ArrayList<>();
-                achievements.add(new Achievement("Achievement1","KILLS",5,Achievement.AchievementType.KILLS,1));
-                achievements.add(new Achievement("Achievement2", "KILLSTREAKS",5,Achievement.AchievementType.KILLSTREAKS,1));
-                achievements.add(new Achievement("Achievement3","LIVES",5,Achievement.AchievementType.LIVES,1));
-                achievements.add(new Achievement("Achievement4","STAGE",5,Achievement.AchievementType.STAGE,1));
-                achievements.add(new Achievement("Achievement5","TRIALS",5,Achievement.AchievementType.TRIALS,1));
-                achievements.add(new Achievement("Achievement6","FASTKILL",5,Achievement.AchievementType.FASTKILL,1));
-                achievements.add(new Achievement("Achievement47","SCORE",5,Achievement.AchievementType.SCORE,1));
+                Achievement achievement1 = new Achievement("Achievement1","KILLS",5,Achievement.AchievementType.KILLS,1);
+                Achievement achievement2 = new Achievement("Achievement2", "KILLSTREAKS",5,Achievement.AchievementType.KILLSTREAKS,1);
+                Achievement achievement3 = new Achievement("Achievement3","LIVES",5,Achievement.AchievementType.LIVES,1);
+                Achievement achievement4 = new Achievement("Achievement4","STAGE",5,Achievement.AchievementType.STAGE,1);
+                Achievement achievement5 = new Achievement("Achievement5","TRIALS",5,Achievement.AchievementType.TRIALS,1);
+                Achievement achievement6 = new Achievement("Achievement6","FASTKILL",5,Achievement.AchievementType.FASTKILL,1);
+                Achievement achievement7 =new Achievement("Achievement7","SCORE",5,Achievement.AchievementType.SCORE,1);
 
+                // complete
+                achievementManager.completeAchievement(achievement1);
+                achievementManager.completeAchievement(achievement3);
+
+                achievements.add(achievement1);
+                achievements.add(achievement2);
+                achievements.add(achievement3);
+                achievements.add(achievement4);
+                achievements.add(achievement5);
+                achievements.add(achievement6);
+                achievements.add(achievement7);
                 return achievements;
             }
         };

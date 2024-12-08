@@ -122,7 +122,7 @@ public class AchievementManager {
     public boolean completeAchievement(Achievement achievement) { // Added Code
         if (!achievement.isCompleted()) {
             achievement.CompleteAchievement();
-            return setAchievementValue(achievement, true);
+            return true;
         }
         return false;
     }
