@@ -123,7 +123,7 @@ public class AchievementConditions {
             }
         }
         if (allCompleted) {
-            completeAchievement(allAchievements.getLast());
+            completeAchievement(allAchievements.get(allAchievements.size() - 1));
         }
     }
 
